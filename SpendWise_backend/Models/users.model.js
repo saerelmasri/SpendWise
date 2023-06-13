@@ -12,7 +12,6 @@ const userSchema = mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        require: true
     },
     currency: {
         type: String,
