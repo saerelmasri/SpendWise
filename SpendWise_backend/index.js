@@ -8,6 +8,13 @@ require('dotenv').config();
 const cors = require('cors');
 app.use(cors());
 
+const V1Router = express.Router();
+const authRoute = require('./Routes/auth.routes');
+V1Router.use('/auth', authRoute);
+
+
+app.use('/v1', V1Router);
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
