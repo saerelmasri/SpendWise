@@ -57,7 +57,7 @@ const removeWallet = async(req, res) => {
     }
     try{
         const { walletID } = req.body;
-        Wallets.findByIdAndRemove(walletID)
+        await Wallets.findByIdAndRemove(walletID)
         .then(removedWallet => {
             if(removedWallet){
                 return res.status(201).json({
@@ -88,6 +88,47 @@ const removeWallet = async(req, res) => {
 }
 
 //Display all wallets with info
+const displayWallets = async (req, res) => {
+    const token = req.header('Authorization');
+    if (!token) {
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+  
+    try {
+        const decoded = jwt.verify(token, process.env.JWT);
+        const userId = decoded.id;
 
-module.exports = { addWallet, removeWallet };
+        const wallets = await Wallets.find({ userID: userId });
+
+        if(!wallets){
+            return res.status('401').json({
+                status: 401,
+                message: 'No wallets found'
+            });
+        }else{
+            return res.status(200).json({
+                status: 200,
+                message: 'Successful',
+                wallets: wallets
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: 500,
+            message: 'Something went wrong. Server Error'
+        });
+    }
+};
+  
+
+
+module.exports = { 
+    addWallet, 
+    removeWallet,
+    displayWallets
+ };
 
