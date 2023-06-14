@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const cardSchema = mongoose.Schema({
+const walletSchema = mongoose.Schema({
     userID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
@@ -22,6 +22,6 @@ const cardSchema = mongoose.Schema({
     }
 });
 
-const Cards = mongoose.model('Cards', cardSchema);
+const Wallets = mongoose.model('Wallets', walletSchema);
 
-module.exports = Cards
+module.exports = Wallets

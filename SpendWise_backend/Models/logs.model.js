@@ -6,9 +6,9 @@ const logSchema = mongoose.Schema({
         ref: 'Category',
         require: true
     },
-    cardID: {
+    walletID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Cards',
+        ref: 'Wallets',
         require: true
     },
     logAmount: {

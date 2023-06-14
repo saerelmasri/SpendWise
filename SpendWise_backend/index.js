@@ -12,6 +12,9 @@ const V1Router = express.Router();
 const authRoute = require('./Routes/auth.routes');
 V1Router.use('/auth', authRoute);
 
+const walletRoute = require('./Routes/wallet.routes');
+V1Router.use('/wallets', walletRoute);
+
 
 app.use('/v1', V1Router);
 
