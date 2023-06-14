@@ -47,8 +47,47 @@ const addWallet = async(req, res) => {
 //Edit wallet
 
 //Remove wallet
+const removeWallet = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+    try{
+        const { walletID } = req.body;
+        Wallets.findByIdAndRemove(walletID)
+        .then(removedWallet => {
+            if(removedWallet){
+                return res.status(201).json({
+                    status: 201,
+                    message: 'Wallet removed successfully'
+                });
+            }else{
+                return res.status(500).json({
+                    status: 500,
+                    message: 'Wallet not found'
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+            return res.status(500).json({
+                status: 500,
+                message: 'Something went wrong'
+            })
+        })
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            status: 500,
+            message: 'Something went wrong. Server Error'
+        });
+    }
+}
 
 //Display all wallets with info
 
-module.exports = addWallet;
+module.exports = { addWallet, removeWallet };
 
