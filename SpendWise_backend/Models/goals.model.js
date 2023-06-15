@@ -19,9 +19,20 @@ const goalSchema = mongoose.Schema({
         ref: 'Category',
         require: true
     },
+    goalDeadline: {
+        type: Number,
+        require: true
+    },
     goalCreatedAt: {
         type: Date,
         default: Date.now
+    },
+    paymentPerMonth: {
+        type: Number,
+    },
+    goalProgress: {
+        type: Number,
+        default: 0
     }
 });
 
