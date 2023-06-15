@@ -16,7 +16,16 @@ const saveOTP = async (userId, code) => {
       console.error(err);
       throw new Error('Failed to save OTP');
     }
-  };
+};
+
+const updateOTP = async(userId, code) => {
+    try{
+        await OTP.findOneAndUpdate({userID: userId}, { $set: {OTP: code}});
+    }catch(err){
+        console.error(err);
+        throw new Error('Failed to save OTP');
+    }
+}
 
 const register = async(req, res) => {
     try{
@@ -168,6 +177,55 @@ const verifyNumber = async(req, res) => {
     }
 }
 
+const sendNewOTP = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+    try{
+        const decode = jwt.verify(token, process.env.JWT);
+        const userID = decode.id;
+        let randCode = Math.floor(Math.random() * 90000) + 10000;
+
+        await Users.findById(userID).then(user => {
+            if(!user){
+                return res.status(401).json({
+                    status: 401,
+                    message: 'User not found'
+                });
+            }
+
+            const phoneNumber = user.phoneNumber;
+
+            client.messages
+            .create({
+            body: `Your verification code is ${randCode}`,
+            from: '+14302456102',
+            to: phoneNumber
+            })
+            .then(() => {
+                updateOTP(userID, randCode);
+                return res.status(201).json({
+                    status: 201,
+                    message: 'Code re-send succesfully'
+                });
+            })
+            .catch(err => {
+                console.log(err);
+            });
+        })
+
+    }catch(err){
+        res.status(500).json({
+            status: 500,
+            message: 'Something went wrong. Server Error'
+        })
+    }
+}
+
 const fetchPhone = async(req, res) => {
     const token = req.header('Authorization');
     if(!token){
@@ -206,9 +264,11 @@ const fetchPhone = async(req, res) => {
     }
 }
 
+
 module.exports = {
     register,
     login,
     verifyNumber,
-    fetchPhone
+    fetchPhone,
+    sendNewOTP
 }
