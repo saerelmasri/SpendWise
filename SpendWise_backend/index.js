@@ -15,6 +15,8 @@ V1Router.use('/auth', authRoute);
 const walletRoute = require('./Routes/wallet.routes');
 V1Router.use('/wallets', walletRoute);
 
+const categoryRoute = require('./Routes/category.routes');
+V1Router.use('/category', categoryRoute);
 
 app.use('/v1', V1Router);
 
