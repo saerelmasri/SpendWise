@@ -133,17 +133,8 @@ const login = async(req, res) => {
 }
 
 const verifyNumber = async(req, res) => {
-    const token = req.header('Authorization');
-    const { code } = req.body;
-    if(!token){
-        return res.status(402).json({
-            status: 402,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id
 
         OTP.findById(userId)
             .then(otp => {
@@ -178,16 +169,8 @@ const verifyNumber = async(req, res) => {
 }
 
 const sendNewOTP = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(409).json({
-            status: 409,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decode = jwt.verify(token, process.env.JWT);
-        const userID = decode.id;
+        const userID = req.user.id
         let randCode = Math.floor(Math.random() * 90000) + 10000;
 
         await Users.findById(userID).then(user => {
@@ -227,16 +210,8 @@ const sendNewOTP = async(req, res) => {
 }
 
 const fetchPhone = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(409).json({
-            status: 409,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id
 
         Users.findById(userId)
             .then(user => {
