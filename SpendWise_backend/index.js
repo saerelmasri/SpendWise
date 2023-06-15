@@ -18,6 +18,9 @@ V1Router.use('/wallets', walletRoute);
 const categoryRoute = require('./Routes/category.routes');
 V1Router.use('/category', categoryRoute);
 
+const goalRoute = require('./Routes/goal.routes');
+V1Router.use('/goals', goalRoute);
+
 app.use('/v1', V1Router);
 
 app.use((req, res, next) => {
