@@ -18,6 +18,10 @@ const goalSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         require: true
+    },
+    goalCreatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
