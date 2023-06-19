@@ -83,7 +83,7 @@ const payGoal = async(req, res) => {
         const goalInfo = await Goal.findOne({_id: goalId, userID: userId});
 
         const info = {
-            payment: parseInt(goalInfo.paymentPerMonth.toFixed(2), 10),
+            payment: parseFloat(goalInfo.paymentPerMonth.toFixed(2), 10),
             name: goalInfo.goalName,
             amount: goalInfo.goalAmount,
             progress: goalInfo.goalProgress,
@@ -157,9 +157,29 @@ const payGoal = async(req, res) => {
 }
 
 //Display all transaction for a goal
+const displayTransactions = async(req, res) => {
+    try{
+        const userId = req.user.id;
+        const { goalId } = req.body;
+        const transactions = await Transaction.find({goalID: goalId, userID: userId});
+        return res.status(201).json({
+            status: 201,
+            message: 'Success',
+            logs: transactions
+        })
+
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            status: 500,
+            message: 'Server error'
+        });
+    }
+}
 
 module.exports = {
     newGoal,
     displayGoals,
-    payGoal
+    payGoal,
+    displayTransactions
 };
