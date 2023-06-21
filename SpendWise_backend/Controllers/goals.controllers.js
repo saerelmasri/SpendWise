@@ -1,6 +1,5 @@
 const Category = require('../Models/category.model');
 const Goal = require('../Models/goals.model');
-const jwt = require('jsonwebtoken');
 const Wallets = require('../Models/wallets.model');
 const Transaction = require('../Models/transaction.model');
 
