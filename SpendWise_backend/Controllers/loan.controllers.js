@@ -45,16 +45,8 @@ const newLoan = async(req, res) => {
 
 //Display loans
 const displayLoans = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(409).json({
-            status: 409,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id;
 
         const allLoans = await Loan.find({userID: userId});
         return res.status(201).json({
@@ -70,16 +62,8 @@ const displayLoans = async(req, res) => {
 
 //Pay loan
 const payLoan = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(409).json({
-            status: 409,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id;
         const { loanId, walletId } = req.body;
 
         const loanInfo = await Loan.findOne({_id: loanId, userID: userId});
@@ -155,10 +139,37 @@ const payLoan = async(req, res) => {
 }
 
 //Display transactions of a loan
+const displayTransactions = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(201).json({
+            status: 201,
+            message: 'Unauthorized'
+        })
+    }
+    try{
+        const decoded = jwt.verify(token, process.env.JWT);
+        const userId = decoded.id;
+        const { loanId } = req.body;
+        const allTransaction = await Transaction.find({loanID: loanId, userID: userId});
+        
+        return res.status(201).json({
+            status: 201,
+            message: 'Success',
+            transactions: allTransaction
+        });
+        
+    }catch(err){
+        console.log(err);
+        throw err;
+    }
+}
+
 
 
 module.exports = {
     newLoan,
     displayLoans,
-    payLoan
+    payLoan,
+    displayTransactions
 };
