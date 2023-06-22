@@ -1,7 +1,9 @@
 const { Router } = require('express');
 const route = Router();
-const newLoan = require('../Controllers/loan.controllers');
+const authenticateToken = require('../Middleware/authenticationJWT');
+const { newLoan, displayLoans } = require('../Controllers/loan.controllers');
 
-route.post('/newLoan', newLoan);
+route.post('/newLoan', authenticateToken, newLoan);
+route.get('/allLoans', displayLoans);
 
 module.exports = route;

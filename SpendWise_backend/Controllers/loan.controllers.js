@@ -16,16 +16,8 @@ const calculateMonthlyPayment = (principal, interestRate, loanTerm) => {
 
 //Create loan
 const newLoan = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(409).json({
-            status: 409,
-            message: 'Unauthorized'
-        });
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id;
         const { name, amount, interest, loanYears } = req.body;
 
         const decimalRepresentation = interest / 100;
@@ -51,10 +43,36 @@ const newLoan = async(req, res) => {
 }
 
 //Display loans
+const displayLoans = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+    try{
+        const decoded = jwt.verify(token, process.env.JWT);
+        const userId = decoded.id;
+
+        const allLoans = await Loan.find({userID: userId});
+        return res.status(201).json({
+            status: 201,
+            message: 'Success',
+            loans: allLoans
+        });
+    }catch(err){
+        console.log(err);
+        throw err;
+    }
+}
 
 //Pay loan
 
 //Display transactions of a loan
 
 
-module.exports = newLoan;
+module.exports = {
+    newLoan,
+    displayLoans
+};
