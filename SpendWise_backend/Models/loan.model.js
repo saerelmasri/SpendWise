@@ -26,6 +26,10 @@ const loanSchema = mongoose.Schema({
     loanMonthyPay: {
         type: Number,
         require: true
+    },
+    loanProgress: {
+        type: Number,
+        require: true
     }
 })
 

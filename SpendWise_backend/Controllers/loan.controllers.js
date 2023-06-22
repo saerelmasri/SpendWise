@@ -30,6 +30,7 @@ const newLoan = async(req, res) => {
         createLoan.loanInterestRate = decimalRepresentation;
         createLoan.loanTermInYears = loanYears;
         createLoan.loanMonthyPay = montlyPayment;
+        createLoan.loanProgress = 0;
         await createLoan.save();
 
         return res.status(201).json({
@@ -68,11 +69,96 @@ const displayLoans = async(req, res) => {
 }
 
 //Pay loan
+const payLoan = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+    try{
+        const decoded = jwt.verify(token, process.env.JWT);
+        const userId = decoded.id;
+        const { loanId, walletId } = req.body;
+
+        const loanInfo = await Loan.findOne({_id: loanId, userID: userId});
+        console.log(loanInfo);
+        const info = {
+            monthlyPay: loanInfo.loanMonthyPay,
+            loanName: loanInfo.loanName,
+            loanAmount: loanInfo.loanAmount,
+            progress: loanInfo.loanProgress
+        }
+
+        if(info.progress === info.loanAmount){
+            return res.status(201).json({
+                status: 201,
+                message: 'Loan paid',
+                key: 'Paid'
+            });
+        }
+
+        //Getting wallet amount
+        const walletInfo = await Wallets.findOne({_id: walletId, userID: userId});
+        const walletAmount = walletInfo.amount;
+
+        //Checking if wallet amount is greater than the monthly payment
+        if(walletAmount < info.monthlyPay){
+            return res.status(401).json({
+                status: 401,
+                message: 'Not enough credits to pay'
+            });
+        }
+
+        //Substracting the monthly payment from the wallet
+        const payment = walletAmount - info.monthlyPay;
+        const updateProgress = info.progress + info.monthlyPay;
+
+        //Updating the wallet amount after substracting the monthly payment
+        const updateWallet = await Wallets.findOneAndUpdate(
+            {_id: walletId, userID: userId},
+            {$set: {amount: payment}}
+        ).exec();
+        if(!updateWallet){
+            return res.status(401).json({
+                status: 401,
+                message: 'Wallet not found'
+            }); 
+        }
+
+        const transaction = await Loan.findOneAndUpdate(
+            {_id: loanId, userID: userId},
+            {$set:{loanProgress: updateProgress}}
+        ).exec();
+        if(!transaction){
+            return res.status(401).json({
+                status: 401,
+                message: 'No goal found to pay',
+            });
+        }
+
+        const loanLog = new Transaction();
+        loanLog.loanID = loanId;
+        loanLog.userID = userId;
+        loanLog.amount = info.monthlyPay;
+        await loanLog.save();
+
+        return res.status(201).json({
+            status: 201,
+            message: 'Transaction looged'
+        });
+    }catch(err){
+        console.log(err);
+        throw err;
+    }
+}
 
 //Display transactions of a loan
 
 
 module.exports = {
     newLoan,
-    displayLoans
+    displayLoans,
+    payLoan
 };
