@@ -6,6 +6,6 @@ const { newLoan, displayLoans, payLoan, displayTransactions } = require('../Cont
 route.post('/newLoan', authenticateToken, newLoan);
 route.get('/allLoans', authenticateToken, displayLoans);
 route.post('/payLoan', authenticateToken, payLoan);
-route.get('/allTransactions', displayTransactions);
+route.get('/allTransactions', authenticateToken, displayTransactions);
 
 module.exports = route;

@@ -24,6 +24,9 @@ V1Router.use('/goals', goalRoute);
 const loanRoute = require('./Routes/loan.routes');
 V1Router.use('/loans', loanRoute);
 
+const logRoute = require('./Routes/log.routes');
+V1Router.use('/logs', logRoute);
+
 app.use('/v1', V1Router);
 
 app.use((req, res, next) => {

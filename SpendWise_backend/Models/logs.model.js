@@ -11,6 +11,11 @@ const logSchema = mongoose.Schema({
         ref: 'Wallets',
         require: true
     },
+    userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
+        require: true
+    },
     logAmount: {
         type: Number,
         require: true

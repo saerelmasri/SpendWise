@@ -140,16 +140,8 @@ const payLoan = async(req, res) => {
 
 //Display transactions of a loan
 const displayTransactions = async(req, res) => {
-    const token = req.header('Authorization');
-    if(!token){
-        return res.status(201).json({
-            status: 201,
-            message: 'Unauthorized'
-        })
-    }
     try{
-        const decoded = jwt.verify(token, process.env.JWT);
-        const userId = decoded.id;
+        const userId = req.user.id;
         const { loanId } = req.body;
         const allTransaction = await Transaction.find({loanID: loanId, userID: userId});
         
