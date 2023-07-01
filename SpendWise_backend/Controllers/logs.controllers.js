@@ -59,10 +59,93 @@ const addLog = async(req, res) => {
 }
 
 //Display logs of a month of a particular wallet
+const monthyExpense = async(req, res) => {
+    const token = req.header('Authorization');
+    if(!token){
+        return res.status(409).json({
+            status: 409,
+            message: 'Unauthorized'
+        });
+    }
+
+    try{
+        const decoded = jwt.verify(token, process.env.JWT);
+        const userId = decoded.id;
+
+        
+
+    }catch(err){
+        console.log(err);
+        throw err;
+    }
+}
 
 //Edit a log
 
 //Remove a log (After removing this particular log, the amount is return to the wallet)
+const deleteLog = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { transactionID } = req.body;
+    
+        const log = await Log.findOne({ _id: transactionID, userID: userId });
+  
+        if (!log) {
+            return res.status(404).json({
+            status: 404,
+            message: 'Log not found'
+            });
+        }
+  
+        let logAmount, walletID, categoryID;
+        if (log) {
+            logAmount = log.logAmount;
+            walletID = log.walletID;
+            categoryID = log.categoryID;
+        }
+  
+        const category = await Category.findOne({ _id: categoryID });
+        if (category && category.type === 'Expenses') {
+            const removeLog = await Log.deleteOne({ _id: transactionID });
+            if (!removeLog) {
+            return res.status(500).json({
+                status: 500,
+                message: 'Error deleting log'
+            });
+            }
+    
+            const returnFunds = await Wallet.findOneAndUpdate(
+            { _id: walletID },
+            { $inc: { amount: logAmount } },
+            { new: true }
+            );
+            if (!returnFunds) {
+            return res.status(500).json({
+                status: 500,
+                message: 'Error updating wallet'
+            });
+            }
+    
+            return res.status(201).json({
+                status: 201,
+                message: 'Log deleted'
+            });
+        } else {
+            return res.status(400).json({
+                status: 400,
+                message: 'Log does not belong to expenses category'
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
+  
 
 
-module.exports = addLog;
+module.exports = {
+    addLog, 
+    monthyExpense,
+    deleteLog
+};
