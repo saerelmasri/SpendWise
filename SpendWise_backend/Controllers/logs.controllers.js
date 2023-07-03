@@ -80,8 +80,6 @@ const monthyExpense = async(req, res) => {
     }
 }
 
-//Edit a log
-
 //Remove a log (After removing this particular log, the amount is return to the wallet)
 const deleteLog = async (req, res) => {
     try {
